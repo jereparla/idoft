@@ -28,8 +28,8 @@ def run_checks(filename):
 			assert bool(re.match(pr_data['Module path'], row[2])) # Check module paths are valid
 			assert bool(re.match(pr_data['Fully-Qualified'], row[3])) # Check for valid fully-qualified name 
 			# Fails because org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke has category 'NOD;ND'
-			if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
-				continue
+			#if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
+				#continue
 			assert all(x in pr_data['Category'] for x in row[4].split(';'))
 			assert row[5] in pr_data['Status'] # Chech the status is valid
 			assert bool(re.match(pr_data['PR Link'], row[6]))
