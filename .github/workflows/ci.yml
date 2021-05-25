@@ -32,5 +32,5 @@ jobs:
           python-version: 3.9.4
       - name: Run script
         run: |
-          python format_checker.py pr-data.csv
+          python format_checker.py
 
