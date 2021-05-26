@@ -23,14 +23,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: jitterbit/get-changed-files@v1
-      # Runs a single command using the runners shell
-      - name: Install Python 3
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9.4
-      - name: Run script
-        run: |
-          python format_checker.py ${{ steps.files.outputs.all }}
+    - name: Get All Changed Files
+      # You may pin to the exact commit or the version.
+      # uses: jitterbit/get-changed-files@b17fbb00bdc0c0f63fcf166580804b4d2cdc2a42
+      uses: jitterbit/get-changed-files@v1
+    - run: |
+        for changed_file in ${{ steps.files.outputs.all }}; do
+          echo "Do something with this ${changed_file}."
+        done
 
