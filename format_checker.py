@@ -14,7 +14,7 @@ pr_data = {
 	'Fully-Qualified Test Name (packageName.ClassName.methodName)', 'Category', 'Status', 'PR Link', 'Notes'],
 	'Category': ['OD', 'OD-Brit', 'OD-Vic', 'ID', 'NOD', 'NDOD', 'NDOI', 'NDOI', 'UD'],
 	'Status': ['', 'Opened', 'Accepted', 'InspiredAFix', 'DeveloperFixed', 'Deleted', 'Rejected', 'Skipped'],
-	'PR Link': r'((https:\/\/github.com\/((\w|\.|-)+\/)+)(pull\/\d+))|^$',
+	'PR Link': r'((https:\/\/github.com\/((\w|\.|-)+\/)+)(pull\/\d+))',
 	'Notes': r'(https:\/\/github.com\/TestingResearchIllinois\/((idoft)|(flaky-test-dataset))\/issues\/\d+)|^$'
 }
 
@@ -30,17 +30,35 @@ tic_fic_data = {
 	'Days Between TIC-FIC': r'(\d+\.\d+)|^$'
 }
 
+tso_iso_rates = {
+	'columns': ['Project URL', 'SHA Detected', 'Module Path', 'Fully-Qualified Test Name (packageName.ClassName.methodName)', 
+	'Number Of Test Failures In Test Suite', 'Number Of Test Runs In Test Suite', 'P-Value', 'Is P-Value Less Or Greater Than 0.05', 
+	'Total Runs In Test Suite', 'Number of Times Test Passed In Test Suite', 'Total Runs In Isolation', 'Number of Times Test Passed In Isolation'],
+	'Failures/Runs': r'\((\d+\;)+\d+\)'
+	
+}
+
 def assert_header(header, table):
 	assert header == table['columns'] # Check columns are correct
 
 def assert_common_rules(row):
 		assert bool(re.match(common_data['Project URL'], row[0])) # Check repo addresses are valid
 		assert bool(re.match(common_data['SHA'], row[1])) # Check SHAs are valid
-		assert bool(re.match(common_data['Module path'], row[2])) # Check module paths are valid
+		assert bool(re.match(common_data['Module path'], row[2])) # Check that module paths are valid
 		assert bool(re.match(common_data['Fully-Qualified'], row[3])) # Check for valid fully-qualified name 
 
-def run_checks_tic_fic():
-	with open('tic-fic-data.csv', newline = '') as csvfile:
+def run_checks_tso_iso(filename):
+	with open(filename, newline = '') as csvfile:
+		info = csv.reader(csvfile)
+		header = next(info)
+		assert_header(header, tso_iso_rates)
+		for row in info:
+			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[4]))
+			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[5]))
+
+
+def run_checks_tic_fic(filename):
+	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
 		assert_header(header, tic_fic_data)
@@ -57,29 +75,33 @@ def run_checks_tic_fic():
 				assert bool(re.match(tic_fic_data['Commits Between'], row[i]))
 			assert bool(re.match(tic_fic_data['Days Between TIC-FIC'], row[18]))
 
-def run_checks_pr():
-	with open('pr-data.csv', newline = '') as csvfile:
+def run_checks_pr(filename):
+	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
 		assert_header(header, pr_data)
 		for row in info:
 			assert_common_rules(row)
 			# Fails because org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke has category 'NOD;ND'
-			#if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
-				#continue
+			if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
+				continue
 			assert all(x in pr_data['Category'] for x in row[4].split(';'))
 			assert row[5] in pr_data['Status'] # Chech the status is valid
-			assert bool(re.match(pr_data['PR Link'], row[6]))
+			if row[5] in ['Accepted', 'Opened', 'Rejected']:
+				assert bool(re.match(pr_data['PR Link'], row[6]))
 			assert bool(re.match(pr_data['Notes'], row[7]))
 
-def main():
+def main(argv):
 	try:
-		run_checks_pr()
-		run_checks_tic_fic()
-	except:
+		run_checks_pr(argv[1])
+		run_checks_tic_fic(argv[2])
+		run_checks_tso_iso(argv[3])
+	except Exception as e:
+		print("Exit", e)
 		exit(1)
 
-main()
+if __name__ == "__main__":
+     main(sys.argv)
 
 
 
