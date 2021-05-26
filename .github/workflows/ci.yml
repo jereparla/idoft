@@ -25,16 +25,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       # Runs a single command using the runners shell
-      - name: list files
-        run: |
-          URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
-          FILES=$(curl -s -X GET -G $URL | jq -r '.[] | .filename')
-          echo $FILES
       - name: Install Python 3
-        uses: actions/setup-python@v2
+      - uses: jitterbit/get-changed-files@v1
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.9.4
       - name: Run script
         run: |
-          python format_checker.py $FILES
+          python format_checker.py ${{ steps.files.outputs.all }}
 
