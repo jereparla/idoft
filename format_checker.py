@@ -34,8 +34,10 @@ tso_iso_rates = {
 	'columns': ['Project URL', 'SHA Detected', 'Module Path', 'Fully-Qualified Test Name (packageName.ClassName.methodName)', 
 	'Number Of Test Failures In Test Suite', 'Number Of Test Runs In Test Suite', 'P-Value', 'Is P-Value Less Or Greater Than 0.05', 
 	'Total Runs In Test Suite', 'Number of Times Test Passed In Test Suite', 'Total Runs In Isolation', 'Number of Times Test Passed In Isolation'],
-	'Failures/Runs': r'\((\d+\;)+\d+\)'
-	
+	'Failures/Runs': r'\((\d+\;)+\d+\)',
+	'P-Value': r'\d(\.\d+(E-\d+)?)?',
+	'Less/Greater': r'(less)|(greater)',
+	'Last 4': r'\d+'
 }
 
 def assert_header(header, table):
@@ -47,18 +49,22 @@ def assert_common_rules(row):
 		assert bool(re.match(common_data['Module path'], row[2])) # Check that module paths are valid
 		assert bool(re.match(common_data['Fully-Qualified'], row[3])) # Check for valid fully-qualified name 
 
-def run_checks_tso_iso(filename):
-	with open(filename, newline = '') as csvfile:
+def run_checks_tso_iso():
+	with open('tso-iso-rates.csv', newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
 		assert_header(header, tso_iso_rates)
 		for row in info:
 			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[4]))
 			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[5]))
+			assert bool(re.match(tso_iso_rates['P-Value'], row[6]))
+			assert bool(re.match(tso_iso_rates['Less/Greater'], row[7]))
+			for i in range(8, 12):
+			    assert bool(re.match(tso_iso_rates['Last 4'], row[i]))
 
 
-def run_checks_tic_fic(filename):
-	with open(filename, newline = '') as csvfile:
+def run_checks_tic_fic():
+	with open('tic-fic-data.csv', newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
 		assert_header(header, tic_fic_data)
@@ -75,8 +81,8 @@ def run_checks_tic_fic(filename):
 				assert bool(re.match(tic_fic_data['Commits Between'], row[i]))
 			assert bool(re.match(tic_fic_data['Days Between TIC-FIC'], row[18]))
 
-def run_checks_pr(filename):
-	with open(filename, newline = '') as csvfile:
+def run_checks_pr():
+	with open('pr-data.csv', newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
 		assert_header(header, pr_data)
@@ -91,19 +97,16 @@ def run_checks_pr(filename):
 				assert bool(re.match(pr_data['PR Link'], row[6]))
 			assert bool(re.match(pr_data['Notes'], row[7]))
 
-def main(argv):
+def main():
 	try:
-		run_checks_pr(argv[1])
-		run_checks_tic_fic(argv[2])
-		run_checks_tso_iso(argv[3])
-	except Exception as e:
-		print("Exit", e)
+		run_checks_pr()
+		run_checks_tic_fic()
+		run_checks_tso_iso()
+	except:
+		print("Exiting because of error")
 		exit(1)
 
-if __name__ == "__main__":
-     main(sys.argv)
-
-
+main()
 
 
 
