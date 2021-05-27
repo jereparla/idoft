@@ -1,7 +1,7 @@
 Project URL,SHA Detected,Module Path,Fully-Qualified Test Name (packageName.ClassName.methodName),Category,Status,PR Link,Notes
-https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.annotation.IdTest.testCompositeKeys,ID,Test,https://github.com/abel533/Mapper/pull/666,
+https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.annotation.IdTest.testCompositeKeys,ID,Opened,https://github.com/abel533/Mapper/pull/666,
 https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.mapperhelper.ComplexEntityTest.test,ID,Opened,https://github.com/abel533/Mapper/pull/666,
-https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.mapperhelper.FieldHelperTest.testComplex,ID,TEST2,https://github.com/abel533/Mapper/pull/666,
+https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.mapperhelper.FieldHelperTest.testComplex,ID,Opened,https://github.com/abel533/Mapper/pull/666,
 https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.mapperhelper.FieldHelperTest.testUser,ID,Opened,https://github.com/abel533/Mapper/pull/666,
 https://github.com/abel533/Mapper,1764748eedb2f320a0d1c43cb4f928c4ccb1f2f5,core,tk.mybatis.mapper.mapperhelper.SqlHelperTest.testLogicDeleteSql,ID,Opened,https://github.com/abel533/Mapper/pull/666,
 https://github.com/Activiti/Activiti,b11f757a48600e53aaf3fcb7a3ba1ece6c463cb4,activiti-engine,org.activiti.engine.test.bpmn.async.AsyncTaskTest.testAsyncEndEvent,UD,,,https://github.com/TestingResearchIllinois/idoft/issues/17
