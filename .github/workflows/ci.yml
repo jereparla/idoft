@@ -5,8 +5,8 @@ name: CI
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
+ # push:
+  #  branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -23,6 +23,14 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Test
-      run: git diff-tree --no-commit-id --name-only -r ${{ github.sha }}
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Install Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.4
+      - name: Run script
+        run: |
+          python format_checker.py pr-data.csv tic-fic-data.csv tso-iso-rates.csv
 
