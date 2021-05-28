@@ -5,8 +5,7 @@ name: CI
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
- # push:
-  #  branches: [ main ]
+  push:
   pull_request:
     branches: [ main ]
 
@@ -24,12 +23,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
           python-version: 3.9.4
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install errorhandler
       - name: Run script
         run: |
           python format_checker.py 
