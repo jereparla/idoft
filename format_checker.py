@@ -8,7 +8,7 @@ common_data = {
 	'Project URL': r'(https:\/\/github.com)(\/(\w|\.|-)+){2}',
 	'SHA': r'\b[0-9a-f]{40}\b',
 	'Module path': r'((\w|\.|-)+(\/|\w|\.|-)*)|^$',
-	'Fully-Qualified': r'((\w|\s)+\.)+(\w+)+' # The whitespace is because https://github.com/pinterest/secor had a whitespace in it --not sure if valid
+	'Fully-Qualified': r'((\w)+\.)+(\w+)+' # The whitespace is because https://github.com/pinterest/secor had a whitespace in it --not sure if valid
 }
 
 pr_data = {
@@ -110,8 +110,8 @@ def run_checks_pr(log):
 		for i, row in enumerate(info):
 			assert_common_rules(row, i, filename, header, log)
 			# Fails because org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke has category 'NOD;ND'
-			if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
-				continue
+			#if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
+				#continue
 			if not all(x in pr_data['Category'] for x in row[4].split(';')):
 				log.error(info_message(filename, i, header[4], row[4]))
 			if not row[5] in pr_data['Status']: # Chech the status is valid
