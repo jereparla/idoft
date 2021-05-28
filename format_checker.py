@@ -1,6 +1,8 @@
 import csv 
 import sys
 import re 
+import logging
+import errorhandler
 
 common_data = {
 	'Project URL': r'(https:\/\/github.com)(\/(\w|\.|-)+){2}',
@@ -40,72 +42,100 @@ tso_iso_rates = {
 	'Last 4': r'\d+'
 }
 
-def assert_header(header, table):
-	assert header == table['columns'] # Check columns are correct
+def info_message(filename, line, column, mismatch):
+	return "ERROR:On file " + filename + ", row " + str(line) + ":\n" + "Invalid " + column + ": " + mismatch
 
-def assert_common_rules(row):
-		assert bool(re.match(common_data['Project URL'], row[0])) # Check repo addresses are valid
-		assert bool(re.match(common_data['SHA'], row[1])) # Check SHAs are valid
-		assert bool(re.match(common_data['Module path'], row[2])) # Check that module paths are valid
-		assert bool(re.match(common_data['Fully-Qualified'], row[3])) # Check for valid fully-qualified name 
+def assert_header(header, valid_dict, filename, log):
+	if not header == valid_dict['columns']:
+		log.error(nfo_message(filename, 0, "Invalid header format " + str(header))) # Check that columns are properly formatted
 
-def run_checks_tso_iso():
-	with open('tso-iso-rates.csv', newline = '') as csvfile:
+def assert_common_rules(row, i, filename, header, log):
+	keys = common_data.keys() 
+	for i, key in enumerate(keys):
+		if not re.match(common_data[key], row[i]):
+			log.error(info_message(filename, i, header[i], row[i])) # Check repo addresses are valid
+
+def run_checks_tso_iso(log):
+	filename = 'tso-iso-rates.csv'
+	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, tso_iso_rates)
-		for row in info:
-			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[4]))
-			assert bool(re.match(tso_iso_rates['Failures/Runs'], row[5]))
-			assert bool(re.match(tso_iso_rates['P-Value'], row[6]))
-			assert bool(re.match(tso_iso_rates['Less/Greater'], row[7]))
-			for i in range(8, 12):
-			    assert bool(re.match(tso_iso_rates['Last 4'], row[i]))
+		assert_header(header, tso_iso_rates, filename, log)
+		for i, row in enumerate(info):
+			if not re.match(tso_iso_rates['Failures/Runs'], row[4]):
+			    log.error(info_message(filename, i, header[4], row[4]))
+			if not re.match(tso_iso_rates['Failures/Runs'], row[5]):
+			    log.error(info_message(filename, i, header[5], row[5]))
+			if not re.match(tso_iso_rates['P-Value'], row[6]):
+				log.error(info_message(filename, i, header[6], row[6]))
+			if not re.match(tso_iso_rates['Less/Greater'], row[7]):
+				log.error(info_message(filename, i, header[7], row[7]))
+			for j in range(8, 12):
+				if not re.match(tso_iso_rates['Last 4'], row[j]):
+					log.error(info_message(filename, header[j], row[j]))
 
-
-def run_checks_tic_fic():
-	with open('tic-fic-data.csv', newline = '') as csvfile:
+def run_checks_tic_fic(log):
+	filename = 'tic-fic-data.csv'
+	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, tic_fic_data)
-		for row in info:
-			assert_common_rules(row)
-			assert bool(re.match(tic_fic_data['TIC = FIC'], row[4]))
-			assert bool(re.match(common_data['SHA'], row[5]))
-			assert bool(re.match(common_data['Fully-Qualified'], row[6]))
-			assert bool(re.match(common_data['Module path'], row[7])) # Check module paths are valid
-			assert bool(re.match(common_data['SHA'], row[8]))
-			for i in range(9, 13):
-				assert bool(re.match(tic_fic_data['Modified'], row[i]))
-			for i in range(13, 18):
-				assert bool(re.match(tic_fic_data['Commits Between'], row[i]))
-			assert bool(re.match(tic_fic_data['Days Between TIC-FIC'], row[18]))
+		assert_header(header, tic_fic_data, filename, log)
+		for i, row in enumerate(info):
+			assert_common_rules(row, i, filename, header, log)
+			if not re.match(tic_fic_data['TIC = FIC'], row[4]):
+				log.error(info_message(filename, i, header[4], row[4]))
+			if not re.match(common_data['SHA'], row[5]):
+				log.error(info_message(filename, i, header[5], row[5]))
+			if not re.match(common_data['Fully-Qualified'], row[6]):
+				log.error(info_message(filename, i, header[6], row[6]))
+			if not re.match(common_data['Module path'], row[7]): # Check module paths are valid
+			    log.error(info_message(filename, i, header[7], row[7]))
+			if not re.match(common_data['SHA'], row[8]):
+				log.error(info_message(filename, i, header[8], row[8]))
+			for j in range(9, 13):
+				if not re.match(tic_fic_data['Modified'], row[j]):
+					log.error(info_message(filename, i, header[j], row[j]))
+			for j in range(13, 18):
+				if not re.match(tic_fic_data['Commits Between'], row[j]):
+					log.error(info_message(filename, i, header[j], row[j]))
+			if not re.match(tic_fic_data['Days Between TIC-FIC'], row[18]):
+				log.error(info_message(filename, i, header[18], row[18]))
 
-def run_checks_pr():
-	with open('pr-data.csv', newline = '') as csvfile:
+def run_checks_pr(log):
+	filename = 'pr-data.csv'
+	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, pr_data)
-		for row in info:
-			assert_common_rules(row)
+		assert_header(header, pr_data, filename, log)
+		for i, row in enumerate(info):
+			assert_common_rules(row, i, filename, header, log)
 			# Fails because org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke has category 'NOD;ND'
 			if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
 				continue
-			assert all(x in pr_data['Category'] for x in row[4].split(';'))
-			assert row[5] in pr_data['Status'] # Chech the status is valid
+			if not all(x in pr_data['Category'] for x in row[4].split(';')):
+				log.error(info_message(filename, i, header[4], row[4]))
+			if not row[5] in pr_data['Status']: # Chech the status is valid
+			    log.error(info_message(filename, i, header[5], row[5]))
 			if row[5] in ['Accepted', 'Opened', 'Rejected']:
-				assert bool(re.match(pr_data['PR Link'], row[6]))
-			assert bool(re.match(pr_data['Notes'], row[7]))
+				if not re.match(pr_data['PR Link'], row[6]):
+					log.error(info_message(filename, i, header[6], row[6]))
+			if not re.match(pr_data['Notes'], row[7]):
+				log.error(info_message(filename, i, header[7], row[7]))
 
 def main():
-	try:
-		run_checks_pr()
-		run_checks_tic_fic()
-		run_checks_tso_iso()
-	except:
-		print("Exiting because of error")
-		exit(1)
+	# Taken from https://stackoverflow.com/a/45446664/9610524
+	error_handler = errorhandler.ErrorHandler()
+	stream_handler = logging.StreamHandler(stream=sys.stderr)
+	logger = logging.getLogger()
+	logger.setLevel(logging.INFO)  # Set whatever logging level for stderr
+	logger.addHandler(stream_handler)
 
+	checks = [run_checks_pr, run_checks_tic_fic, run_checks_tso_iso]
+	for check in checks:
+		check(logger)
+	if error_handler.fired:
+	    logger.critical('Failure: exiting with code 1 due to logged errors.')
+	    raise SystemExit(1)
 main()
 
 
