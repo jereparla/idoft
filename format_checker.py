@@ -8,7 +8,7 @@ common_data = {
 	'Project URL': r'(https:\/\/github.com)(\/(\w|\.|-)+){2}',
 	'SHA': r'\b[0-9a-f]{40}\b',
 	'Module path': r'((\w|\.|-)+(\/|\w|\.|-)*)|^$',
-	'Fully-Qualified': r'((\w|\s)+\.)+(\w+)+' # The whitespace is because https://github.com/pinterest/secor had a whitespace in it --not sure if valid
+	'Fully-Qualified': r'((\w)+\.)+(\w+)+' # The whitespace is because https://github.com/pinterest/secor had a whitespace in it --not sure if valid
 }
 
 pr_data = {
