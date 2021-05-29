@@ -45,23 +45,24 @@ tso_iso_rates = {
 def info_message(filename, line, column, mismatch):
 	return "ERROR:On file " + filename + ", row " + str(line) + ":\n" + "Invalid " + column + ": " + mismatch
 
-def assert_header(header, valid_dict, filename, log):
+def validate_header(header, valid_dict, filename, log):
 	if not header == valid_dict['columns']:
-		log.error(nfo_message(filename, 0, "Invalid header format " + str(header))) # Check that columns are properly formatted
+		log.error(info_message(filename, 1, 'header', str(header))) # Check that columns are properly formatted
 
-def assert_common_rules(row, i, filename, header, log):
+def validate_common_rules(row, i, filename, header, log):
 	keys = common_data.keys() 
-	for i, key in enumerate(keys):
-		if not re.match(common_data[key], row[i]):
-			log.error(info_message(filename, i, header[i], row[i])) # Check repo addresses are valid
+	for j, key in enumerate(keys):
+		if not re.match(common_data[key], row[j]):
+			log.error(info_message(filename, i, header[j], row[j])) # Check repo addresses are valid
 
 def run_checks_tso_iso(log):
 	filename = 'tso-iso-rates.csv'
 	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, tso_iso_rates, filename, log)
+		validate_header(header, tso_iso_rates, filename, log)
 		for i, row in enumerate(info):
+			i += 2
 			if not re.match(tso_iso_rates['Failures/Runs'], row[4]):
 			    log.error(info_message(filename, i, header[4], row[4]))
 			if not re.match(tso_iso_rates['Failures/Runs'], row[5]):
@@ -79,16 +80,17 @@ def run_checks_tic_fic(log):
 	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, tic_fic_data, filename, log)
+		validate_header(header, tic_fic_data, filename, log)
 		for i, row in enumerate(info):
-			assert_common_rules(row, i, filename, header, log)
+			i += 2
+			validate_common_rules(row, i, filename, header, log)
 			if not re.match(tic_fic_data['TIC = FIC'], row[4]):
 				log.error(info_message(filename, i, header[4], row[4]))
 			if not re.match(common_data['SHA'], row[5]):
 				log.error(info_message(filename, i, header[5], row[5]))
 			if not re.match(common_data['Fully-Qualified'], row[6]):
 				log.error(info_message(filename, i, header[6], row[6]))
-			if not re.match(common_data['Module path'], row[7]): # Check module paths are valid
+			if not re.match(common_data['Module path'], row[7]): 
 			    log.error(info_message(filename, i, header[7], row[7]))
 			if not re.match(common_data['SHA'], row[8]):
 				log.error(info_message(filename, i, header[8], row[8]))
@@ -106,15 +108,16 @@ def run_checks_pr(log):
 	with open(filename, newline = '') as csvfile:
 		info = csv.reader(csvfile)
 		header = next(info)
-		assert_header(header, pr_data, filename, log)
+		validate_header(header, pr_data, filename, log)
 		for i, row in enumerate(info):
-			assert_common_rules(row, i, filename, header, log)
-			# Fails because org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke has category 'NOD;ND'
+			i += 2
+			validate_common_rules(row, i, filename, header, log)
+			# Avoid until pr-data.csv is fixed
 			if row[3] == 'org.apache.dubbo.rpc.protocol.dubbo.MultiThreadTest.testDubboMultiThreadInvoke':
 				continue
 			if not all(x in pr_data['Category'] for x in row[4].split(';')):
 				log.error(info_message(filename, i, header[4], row[4]))
-			if not row[5] in pr_data['Status']: # Chech the status is valid
+			if not row[5] in pr_data['Status']: # Check the status is valid
 			    log.error(info_message(filename, i, header[5], row[5]))
 			if row[5] in ['Accepted', 'Opened', 'Rejected']:
 				if not re.match(pr_data['PR Link'], row[6]):
@@ -127,14 +130,14 @@ def main():
 	error_handler = errorhandler.ErrorHandler()
 	stream_handler = logging.StreamHandler(stream=sys.stderr)
 	logger = logging.getLogger()
-	logger.setLevel(logging.INFO)  # Set whatever logging level for stderr
+	logger.setLevel(logging.INFO)  
 	logger.addHandler(stream_handler)
 
 	checks = [run_checks_pr, run_checks_tic_fic, run_checks_tso_iso]
 	for check in checks:
 		check(logger)
 	if error_handler.fired:
-	    logger.critical('Failure: exiting with code 1 due to logged errors.')
+	    logger.critical('Failure: Exiting with code 1 due to logged errors.')
 	    raise SystemExit(1)
 main()
 
