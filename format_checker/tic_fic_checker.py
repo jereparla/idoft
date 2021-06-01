@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_error, check_header, check_row_length, check_common_rules, common_data
+from utils import log_std_error, check_header, check_row_length, check_common_rules, common_data
 
 # Contains information and regexs unique to tic-fic-data.csv
 
@@ -38,7 +38,7 @@ def check_days_between(filename, row, i, log):
     if not re.fullmatch(
             tic_fic_data['Days Between TIC-FIC'],
             row['Days Between TIC-FIC']):
-        log_error(filename, i, row, 'Days Between TIC-FIC', log)
+        log_std_error(filename, log, i, row, 'Days Between TIC-FIC')
 
 # Checks validity of Flaky Test File Modified, Other Test Files Modified,
 # Code Under Test Files Modified, Build Related Files Modified
@@ -52,7 +52,7 @@ def check_mods(filename, row, i, log):
         'Build Related Files Modified']
     for key in keys:
         if not re.fullmatch(tic_fic_data['Modified'], row[key]):
-            log_error(filename, i, row, key, log)
+            log_std_error(filename, log, i, row, key)
 
 # Checks of Flakiness-Introducing Commit SHA
 
@@ -61,7 +61,7 @@ def check_fic_SHA(filename, row, i, log):
     if not re.fullmatch(
             common_data['SHA'],
             row['Flakiness-Introducing Commit SHA']):
-        log_error(filename, i, row, 'Flakiness-Introducing Commit SHA', log)
+        log_std_error(filename, log, i, row, 'Flakiness-Introducing Commit SHA')
 
 # Checks validity of Test-Introducing Commit Module Path
 
@@ -70,7 +70,7 @@ def check_tic_mp(filename, row, i, log):
     if not re.fullmatch(
             common_data['Module Path'],
             row['Test-Introducing Commit Module Path']):
-        log_error(ilename, i, row, 'Test-Introducing Commit Module Path', log)
+        log_std_error(ilename, log, i, row, 'Test-Introducing Commit Module Path')
 
 # Checks validity of Test-Introducing Commit Fully-Qualified Test Name
 
@@ -79,12 +79,7 @@ def check_tic_fqn(filename, row, i, log):
     if not re.fullmatch(
             common_data['Fully-Qualified Name'],
             row['Test-Introducing Commit Fully-Qualified Test Name']):
-        log_error(
-            filename,
-            i,
-            row,
-            'Test-Introducing Commit Fully-Qualified Test Name',
-            log)
+        log_std_error(filename, log, i, row, 'Test-Introducing Commit Fully-Qualified Test Name')
 
 # Checks validity of Test-Introducing Commit SHA
 
@@ -93,14 +88,14 @@ def check_tic_SHA(filename, row, i, log):
     if not re.fullmatch(
             common_data['SHA'],
             row['Test-Introducing Commit SHA']):
-        log_error(filename, i, row, 'Test-Introducing Commit SHA', log)
+        log_std_error(filename, log, i, row, 'Test-Introducing Commit SHA')
 
 # Checks validity of TIC = FIC.
 
 
 def check_tic_eq_fic(filename, row, i, log):
     if not re.fullmatch(tic_fic_data['TIC = FIC'], row['TIC = FIC']):
-        log_error(filename, i, row, 'TIC = FIC', log)
+        log_std_error(filename, log, i, row, 'TIC = FIC')
 
 
 # Checks that tic-fic-data.csv is properly formatted.

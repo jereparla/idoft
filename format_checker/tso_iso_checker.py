@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_error, check_header, check_row_length, check_common_rules, common_data
+from utils import log_std_error, check_header, check_row_length, check_common_rules, common_data
 
 # Contains information and data unique to tso-iso-rates.csv
 
@@ -37,8 +37,7 @@ def check_totals(filename, row, i, log):
         'Number of Times Test Passed In Isolation']
     for key in keys:
         if not re.fullmatch(tso_iso_rates['Last 4'], row[key]):
-            log_error(filename, row, key, log)
-
+            log_std_error(filename, log, i, row, key)
 # Checks validity of Is P-Value Less Or Greater Than 0.05
 
 
@@ -46,19 +45,14 @@ def check_less_greater(filename, row, i, log):
     if not re.fullmatch(
             tso_iso_rates['Less/Greater'],
             row['Is P-Value Less Or Greater Than 0.05']):
-        log_error(
-            filename,
-            i,
-            row,
-            'Is P-Value Less Or Greater Than 0.05',
-            log)
+        log_std_error(filename, log, i, row, 'Is P-Value Less Or Greater Than 0.05')
 
 # Checks validity of P-Value
 
 
 def check_pvalue(filename, row, i, log):
     if not re.fullmatch(tso_iso_rates['P-Value'], row['P-Value']):
-        log_error(filename, i, row, 'P-Value', log)
+        log_std_error(filename, log, i, row, 'P-Value')
 
 # Checks validity of Number Of Test Runs In Test Suite
 
@@ -67,7 +61,7 @@ def check_num_runs(filename, row, i, log):
     if not re.fullmatch(
             tso_iso_rates['Failures/Runs'],
             row['Number Of Test Runs In Test Suite']):
-        log_error(ilename, i, row, 'Number Of Test Runs In Test Suite', log)
+        log_std_error(ilename, log, i, row, 'Number Of Test Runs In Test Suite')
 
 # Checks validity of Number Of Test Failures In Test Suite
 
@@ -76,12 +70,7 @@ def check_num_failures(filename, row, i, log):
     if not re.fullmatch(
             tso_iso_rates['Failures/Runs'],
             row['Number Of Test Failures In Test Suite']):
-        log_error(
-            filename,
-            i,
-            row,
-            'Number Of Test Failures In Test Suite',
-            log)
+        log_std_error(filename, log, i, row, 'Number Of Test Failures In Test Suite')
 
 # Checks that tso-iso-data.csv is properly formatted.
 
