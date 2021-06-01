@@ -33,5 +33,5 @@ jobs:
           pip install errorhandler
       - name: Run format checker
         run: |
-          python format_checker.py 
+          python ./format_checker/main.py 
 
