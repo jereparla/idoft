@@ -5,35 +5,45 @@ import pandas as pd
 
 # Contains regexs for columns that are commmon to pr-data and tic-fic-data
 
-
 common_data = {
-    'Project URL': r'(https:\/\/github.com)(\/(\w|\.|-)+){2}',  # USE COMPILE
-    'SHA': r'\b[0-9a-f]{40}\b',
-    'Module Path': r'((\w|\.|-)+(\/|\w|\.|-)*)|^$',
-    'Fully-Qualified Name': r'((\w|\s)+\.)+(\w+|\d+|\W+)+(\[((\d+)|(\w+|\s)+)\])?'
+    'Project URL': re.compile(r'(https:\/\/github.com)(\/(\w|\.|-)+){2}'),
+    'SHA': re.compile(r'\b[0-9a-f]{40}\b'),
+    'Module Path': re.compile(r'((\w|\.|-)+(\/|\w|\.|-)*)|^$'),
+    'Fully-Qualified Name': re.compile(r'((\w|\s)+\.)+(\w+|\d+|\W+)+(\[((\d+)|(\w+|\s)+)\])?')
 }
 
+# Computes which lines have been modified in the last commit
+
+
 def get_committed_lines(filename):
-    command = "git blame " + filename + " | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:"
-    committed_lines = subprocess.check_output(command, shell = True)
-    committed_lines = committed_lines.decode("utf-8").split('\n')[0:-1]
+    command = "git blame " + filename + \
+        " | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:"
+    committed_lines = subprocess.check_output(command, shell=True)
+    committed_lines = committed_lines.decode("utf-8").split('\n')[:-1]
     return committed_lines
 
+# Computes which lines have been modified in filename but not yet committed
+
+
 def get_uncommitted_lines(filename):
-    command = "git blame " + filename + " | grep -n '^0\{8\} ' | cut -f1 -d:"
-    uncommitted_lines = subprocess.check_output(command, shell = True)
-    uncommitted_lines = uncommitted_lines.decode("utf-8").split('\n')[0:-1]
+    command = "git blame " + filename + " | grep -n '^0\\{8\\} ' | cut -f1 -d:"
+    uncommitted_lines = subprocess.check_output(command, shell=True)
+    uncommitted_lines = uncommitted_lines.decode("utf-8").split('\n')[:-1]
     return uncommitted_lines
+
+# Logs a merely informational message
+
 
 def log_info(filename, log, message):
     log.info("INFO: On file " + filename + ": " + message)
 
 # Logs a standard error
 
+
 def log_std_error(filename, log, line, row, key):
     log_std_error.tracker += 1
     log.error("ERROR: On file " + filename + ", row " + str(line) +
-            ":\n" + "Invalid " + key + ": \"" + row[key] + "\"")
+              ":\n" + "Invalid " + key + ": \"" + row[key] + "\"")
 
 # Logs a special error
 
@@ -55,16 +65,20 @@ def check_header(header, valid_dict, filename, log):
 
 
 def check_common_rules(filename, row, i, log):
-    if not re.fullmatch(common_data['Project URL'], row['Project URL']):
+    if not common_data['Project URL'].fullmatch(row['Project URL']):
         log_std_error(filename, log, i, row, 'Project URL')
-    if not re.fullmatch(common_data['SHA'], row['SHA Detected']):
+    if not common_data['SHA'].fullmatch(row['SHA Detected']):
         log_std_error(filename, log, i, row, 'SHA Detected')
-    if not re.fullmatch(common_data['Module Path'], row['Module Path']):
+    if not common_data['Module Path'].fullmatch(row['Module Path']):
         log_std_error(filename, log, i, row, 'Module Path')
-    if not re.fullmatch(
-            common_data['Fully-Qualified Name'],
+    if not common_data['Fully-Qualified Name'].fullmatch(
             row['Fully-Qualified Test Name (packageName.ClassName.methodName)']):
-        log_std_error(filename, log, i, row, 'Fully-Qualified Test Name (packageName.ClassName.methodName)')
+        log_std_error(
+            filename,
+            log,
+            i,
+            row,
+            'Fully-Qualified Test Name (packageName.ClassName.methodName)')
 
 # Checks that each row has the required length
 
@@ -78,12 +92,9 @@ def check_row_length(filename, row, i, log, header_len):
 
 def check_sort(filename, sortby, log):
     df = pd.read_csv(filename)
-    #sorteddf = df.sort_values(by=sortby, key=lambda col: col.str.lower(), ignore_index = True)
-    #print(df.compare(sorteddf))
-    #sorteddf.to_csv('sorted-pr-data.csv', index=False)
-    if not df.equals(df.sort_values(by=sortby, key=lambda col: col.str.lower(), ignore_index = True)):
+    # sorteddf = df.sort_values(by=sortby, key=lambda col: col.str.lower(), ignore_index = True)
+    # print(df.compare(sorteddf))
+    # sorteddf.to_csv('sorted-pr-data.csv', index=False)
+    if not df.equals(df.sort_values(
+            by=sortby, key=lambda col: col.str.lower(), ignore_index=True)):
         log_esp_error(filename, log, "The file is not properly ordered")
-    
-
-
-

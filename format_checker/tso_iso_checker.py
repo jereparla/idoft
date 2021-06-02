@@ -1,9 +1,8 @@
 import csv
 import re
-from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort,get_committed_lines, get_uncommitted_lines
+from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort, get_committed_lines, get_uncommitted_lines
 
 # Contains information and data unique to tso-iso-rates.csv
-
 
 tso_iso_rates = {
     'columns': [
@@ -19,13 +18,14 @@ tso_iso_rates = {
         'Number of Times Test Passed In Test Suite',
         'Total Runs In Isolation',
         'Number of Times Test Passed In Isolation'],
-    'Failures/Runs': r'\((\d+\;)+\d+\)',
-    'P-Value': r'\d(\.\d+(E-\d+)?)?',
-    'Less/Greater': r'(less)|(greater)',
-    'Last 4': r'\d+'}
+    'Failures/Runs': re.compile(r'\((\d+\;)+\d+\)'),
+    'P-Value': re.compile(r'\d(\.\d+(E-\d+)?)?'),
+    'Less/Greater': re.compile(r'(less)|(greater)'),
+    'Last 4': re.compile(r'\d+')
+}
 
 # Checks validity of Total Runs In Test Suite, Number of Times Test Passed
-# In Test Suite, Total Runs In Isolation, Number of Times Test Passed In
+# In Test Suite, Total Runs In Isolation and Number of Times Test Passed In
 # Isolation
 
 
@@ -36,41 +36,54 @@ def check_totals(filename, row, i, log):
         'Total Runs In Isolation',
         'Number of Times Test Passed In Isolation']
     for key in keys:
-        if not re.fullmatch(tso_iso_rates['Last 4'], row[key]):
+        if not tso_iso_rates['Last 4'].fullmatch(row[key]):
             log_std_error(filename, log, i, row, key)
+
 # Checks validity of Is P-Value Less Or Greater Than 0.05
 
 
 def check_less_greater(filename, row, i, log):
-    if not re.fullmatch(
-            tso_iso_rates['Less/Greater'],
+    if not tso_iso_rates['Less/Greater'].fullmatch(
             row['Is P-Value Less Or Greater Than 0.05']):
-        log_std_error(filename, log, i, row, 'Is P-Value Less Or Greater Than 0.05')
+        log_std_error(
+            filename,
+            log,
+            i,
+            row,
+            'Is P-Value Less Or Greater Than 0.05')
 
 # Checks validity of P-Value
 
 
 def check_pvalue(filename, row, i, log):
-    if not re.fullmatch(tso_iso_rates['P-Value'], row['P-Value']):
+    if not tso_iso_rates['P-Value'].fullmatch(row['P-Value']):
         log_std_error(filename, log, i, row, 'P-Value')
 
 # Checks validity of Number Of Test Runs In Test Suite
 
 
 def check_num_runs(filename, row, i, log):
-    if not re.fullmatch(
-            tso_iso_rates['Failures/Runs'],
+    if not tso_iso_rates['Failures/Runs'].fullmatch(
             row['Number Of Test Runs In Test Suite']):
-        log_std_error(ilename, log, i, row, 'Number Of Test Runs In Test Suite')
+        log_std_error(
+            ilename,
+            log,
+            i,
+            row,
+            'Number Of Test Runs In Test Suite')
 
 # Checks validity of Number Of Test Failures In Test Suite
 
 
 def check_num_failures(filename, row, i, log):
-    if not re.fullmatch(
-            tso_iso_rates['Failures/Runs'],
+    if not tso_iso_rates['Failures/Runs'].fullmatch(
             row['Number Of Test Failures In Test Suite']):
-        log_std_error(filename, log, i, row, 'Number Of Test Failures In Test Suite')
+        log_std_error(
+            filename,
+            log,
+            i,
+            row,
+            'Number Of Test Failures In Test Suite')
 
 # Checks that tso-iso-data.csv is properly formatted.
 
@@ -88,6 +101,11 @@ def run_checks_tso_iso(log):
                 i += 2
                 line = str(i)
                 params = [file, row, i, log]
+
+                # The line is either (1) only uncomitted (needs to always be checked locally), (2) only committed (needs to always be checked in CI)
+                # or both in the last commit and uncommitted (which in practice
+                # is the same as (1) --the committed one is deprecated--).
+
                 if (line in uncommitted_lines) or (line in committed_lines):
                     check_row_length(*params, len(header))
                     check_num_failures(*params)
