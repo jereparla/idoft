@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, check_header, check_row_length, check_common_rules, common_data
+from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort,get_committed_lines, get_uncommitted_lines
 
 # Contains information and regexs unique to tic-fic-data.csv
 
@@ -103,19 +103,26 @@ def check_tic_eq_fic(filename, row, i, log):
 
 def run_checks_tic_fic(log):
     file = 'tic-fic-data.csv'
+    committed_lines = get_committed_lines(file)
+    uncommitted_lines = get_uncommitted_lines(file)
     with open(file, newline='') as csvfile:
         info = csv.DictReader(csvfile, tic_fic_data['columns'])
         header = next(info)
         check_header(list(header.keys()), tic_fic_data, file, log)
-        for i, row in enumerate(info):
-            i += 2
-            params = [file, row, i, log]
-            check_row_length(*params, len(header))
-            check_common_rules(*params)
-            check_tic_eq_fic(*params)
-            check_tic_SHA(*params)
-            check_tic_fqn(*params)
-            check_tic_mp(*params)
-            check_fic_SHA(*params)
-            check_mods(*params)
-            check_days_between(*params)
+        if uncommitted_lines != [] or committed_lines != []:
+            for i, row in enumerate(info):
+                i += 2
+                line = str(i)
+                params = [file, row, i, log]
+                if (line in uncommitted_lines) ^ (line in committed_lines):
+                    check_row_length(*params, len(header))
+                    check_common_rules(*params)
+                    check_tic_eq_fic(*params)
+                    check_tic_SHA(*params)
+                    check_tic_fqn(*params)
+                    check_tic_mp(*params)
+                    check_fic_SHA(*params)
+                    check_mods(*params)
+                    check_days_between(*params)
+        else:
+            log_info(file, log, "There are no changes to be checked")

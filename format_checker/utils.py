@@ -1,5 +1,6 @@
 import re
 import csv
+import subprocess
 import pandas as pd
 
 # Contains regexs for columns that are commmon to pr-data and tic-fic-data
@@ -11,6 +12,21 @@ common_data = {
     'Module Path': r'((\w|\.|-)+(\/|\w|\.|-)*)|^$',
     'Fully-Qualified Name': r'((\w|\s)+\.)+(\w+|\d+|\W+)+(\[((\d+)|(\w+|\s)+)\])?'
 }
+
+def get_committed_lines(filename):
+    command = "git blame " + filename + " | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:"
+    committed_lines = subprocess.check_output(command, shell = True)
+    committed_lines = committed_lines.decode("utf-8").split('\n')[0:-1]
+    return committed_lines
+
+def get_uncommitted_lines(filename):
+    command = "git blame " + filename + " | grep -n '^0\{8\} ' | cut -f1 -d:"
+    uncommitted_lines = subprocess.check_output(command, shell = True)
+    uncommitted_lines = uncommitted_lines.decode("utf-8").split('\n')[0:-1]
+    return uncommitted_lines
+
+def log_info(filename, log, message):
+    log.info("INFO: On file " + filename + ": " + message)
 
 # Logs a standard error
 

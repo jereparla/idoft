@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, check_header, check_row_length, check_common_rules, common_data
+from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort,get_committed_lines, get_uncommitted_lines
 
 # Contains information and data unique to tso-iso-rates.csv
 
@@ -77,16 +77,23 @@ def check_num_failures(filename, row, i, log):
 
 def run_checks_tso_iso(log):
     file = 'tso-iso-rates.csv'
+    committed_lines = get_committed_lines(file)
+    uncommitted_lines = get_uncommitted_lines(file)
     with open(file, newline='') as csvfile:
         info = csv.DictReader(csvfile, tso_iso_rates['columns'])
         header = next(info)
         check_header(list(header.keys()), tso_iso_rates, file, log)
-        for i, row in enumerate(info):
-            i += 2
-            params = [file, row, i, log]
-            check_row_length(*params, len(header))
-            check_num_failures(*params)
-            check_num_runs(*params)
-            check_pvalue(*params)
-            check_less_greater(*params)
-            check_totals(*params)
+        if uncommitted_lines != [] or committed_lines != []:
+            for i, row in enumerate(info):
+                i += 2
+                line = str(i)
+                params = [file, row, i, log]
+                if (line in uncommitted_lines) or (line in committed_lines):
+                    check_row_length(*params, len(header))
+                    check_num_failures(*params)
+                    check_num_runs(*params)
+                    check_pvalue(*params)
+                    check_less_greater(*params)
+                    check_totals(*params)
+        else:
+            log_info(file, log, "There are no changes to be checked")

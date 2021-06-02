@@ -17,9 +17,9 @@ if __name__ == "__main__":
     run_checks_pr(logger)
     run_checks_tic_fic(logger)
     run_checks_tso_iso(logger)
+    error_count = str(log_std_error.tracker + log_esp_error.tracker)
     if error_handler.fired:
-        logger.critical('FAILURE: Exiting with code 1 due to ' +
-                        str(log_std_error.tracker + log_esp_error.tracker) + ' logged errors.')
+        logger.critical('FAILURE: Exiting with code 1 due to ' + error_count + ' logged errors.')
         raise SystemExit(1)
     else:
         logger.info('Success: 0 logged errors')
