@@ -74,6 +74,8 @@ def check_notes(filename, row, i, log):
 
 def run_checks_pr(log):
     file = 'pr-data.csv'
+    aa = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode("utf-8").split('\n')[0:-1]
+    print(aa)
     changed_lines = subprocess.check_output("git blame pr-data.csv | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:", shell=True)
     changed_lines = changed_lines.decode("utf-8").split('\n')[0:-1]
     log.info(str(changed_lines))
@@ -84,13 +86,13 @@ def run_checks_pr(log):
         for i, row in enumerate(info):
             i += 2
             params = [file, row, i, log]
-            if i in changed_lines:
-                check_row_length(*params, len(header))
-                check_common_rules(*params)
-                check_category(*params)
-                check_status(*params)
-                check_status_consistency(*params)
-                check_notes(*params)
+            #if str(i) in changed_lines:
+            check_row_length(*params, len(header))
+            check_common_rules(*params)
+            check_category(*params)
+            check_status(*params)
+            check_status_consistency(*params)
+            check_notes(*params)
         sortby = ['Project URL', 'Fully-Qualified Test Name (packageName.ClassName.methodName)', 'Module Path', 'SHA Detected'] + pr_data['columns'][4:]
         #check_sort(file, sortby, log)
 
