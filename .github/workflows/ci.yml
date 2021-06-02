@@ -26,6 +26,8 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
+          fetch-depth: 0
+        with:
           python-version: 3.9.4
       - name: Install dependencies
         run: |
