@@ -74,7 +74,7 @@ def check_notes(filename, row, i, log):
 
 def run_checks_pr(log):
     file = 'pr-data.csv'
-    changed_lines = subprocess.check_output("git blame pr-data.csv | grep -n '^0\{8\} ' | cut -f1 -d:", shell=True)
+    changed_lines = subprocess.check_output("git blame pr-data.csv | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:", shell=True)
     changed_lines = changed_lines.decode("utf-8").split('\n')[0:-1]
     log.info(str(changed_lines))
     with open(file, newline='') as csvfile:
