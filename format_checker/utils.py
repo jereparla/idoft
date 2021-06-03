@@ -1,7 +1,6 @@
 import re
 import csv
 import subprocess
-import pandas as pd
 
 # Contains regexs for columns that are commmon to pr-data and tic-fic-data
 
@@ -52,6 +51,17 @@ def log_esp_error(filename, log, message):
     log_esp_error.tracker += 1
     log.error("ERROR: On file " + filename + ": " + message)
 
+
+def log_warning(filename, log, line, message):
+    log_warning.tracker += 1
+    log.warning(
+        "WARNING: On file " +
+        filename +
+        ", row " +
+        str(line) +
+        ": \n" +
+        message)
+
 # Validates that the header is correct
 
 
@@ -87,14 +97,11 @@ def check_row_length(filename, row, i, log, header_len):
     if len(row) != header_len:
         log_std_error(filename, log, i, 'row length', str(row))
 
-# Check that the file is well-ordered
+# Order a file
 
 
-def check_sort(filename, sortby, log):
-    df = pd.read_csv(filename)
-    # sorteddf = df.sort_values(by=sortby, key=lambda col: col.str.lower(), ignore_index = True)
-    # print(df.compare(sorteddf))
-    # sorteddf.to_csv('sorted-pr-data.csv', index=False)
-    if not df.equals(df.sort_values(
-            by=sortby, key=lambda col: col.str.lower(), ignore_index=True)):
+def sort(filename, log):
+    command = "echo \"$(head -n1 pr-data.csv && tail +2 pr-data.csv | LC_ALL=C sort -k1,1 -k4,4 -t, -f)\" > sorted-pr-data.csv; diff pr-data.csv sorted-pr-data.csv; rm sorted-pr-data.csv"
+    diff = subprocess.check_output(command, shell=True).decode("utf-8")
+    if diff != "": 
         log_esp_error(filename, log, "The file is not properly ordered")

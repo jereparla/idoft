@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort, get_committed_lines, get_uncommitted_lines
+from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, sort
 
 # Contains information and data unique to tso-iso-rates.csv
 
@@ -100,13 +100,13 @@ def run_checks_tso_iso(log):
             for i, row in enumerate(info):
                 i += 2
                 line = str(i)
-                params = [file, row, i, log]
 
                 # The line is either (1) only uncomitted (needs to always be checked locally), (2) only committed (needs to always be checked in CI)
                 # or both in the last commit and uncommitted (which in practice
                 # is the same as (1) --the committed one is deprecated--).
 
                 if (line in uncommitted_lines) or (line in committed_lines):
+                    params = [file, row, i, log]
                     check_row_length(*params, len(header))
                     check_num_failures(*params)
                     check_num_runs(*params)

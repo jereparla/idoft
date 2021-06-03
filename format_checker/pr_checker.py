@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, check_sort, get_committed_lines, get_uncommitted_lines
+from utils import log_std_error, log_esp_error, log_info, log_warning, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, sort
 
 
 # Contains information and regexs unique to pr-data.csv
@@ -49,20 +49,41 @@ def check_status_consistency(filename, row, i, log):
                 r'\/pull\/\d+',
                 '',
                 row['PR Link']).casefold() != row['Project URL'].casefold()):
-            log_std_error(filename, log, i, row, 'PR Link')
+
+            # The project apache/incubator-dubbo was renamed to apache/dubbo, so the Project URL name (old) doesn't match
+            # the PR Link name (new), despite them being the same project. This
+            # if statement is a workaround for that issue.
+
+            if row['Project URL'] == 'https://github.com/apache/incubator-dubbo' and re.sub(
+                    r'\/pull\/\d+', '', row['PR Link']).casefold() == 'https://github.com/apache/dubbo':
+                pass
+            else:
+                log_std_error(filename, log, i, row, 'PR Link')
 
     if row['Status'] in ['InspiredAFix', 'Skipped']:
 
         # Must contain a note
 
         if row['Notes'] == '':
-            log_std_error(filename, log, i, row, 'Notes')
+            log_warning(
+                filename,
+                log,
+                i,
+                'Status ' +
+                row['Status'] +
+                ' should contain a note')
 
         # Must contain a PR Link
 
         if row['Status'] == 'InspiredAFix' and not pr_data['PR Link'].fullmatch(
                 row['PR Link']):
-            log_std_error(filename, log, i, row, 'PR Link')
+            log_warning(
+                filename,
+                log,
+                i,
+                'Status ' +
+                row['Status'] +
+                ' should have a note')
 
 # Checks validity of Notes
 
@@ -86,13 +107,13 @@ def run_checks_pr(log):
             for i, row in enumerate(info):
                 i += 2
                 line = str(i)
-                params = [file, row, i, log]
 
                 # The line is either (1) only uncomitted (needs to always be checked locally), (2) only committed (needs to always be checked in CI)
                 # or both in the last commit and uncommitted (which in practice
                 # is the same as (1) --the committed one is deprecated--).
 
                 if (line in uncommitted_lines) or (line in committed_lines):
+                    params = [file, row, i, log]
                     check_row_length(*params, len(header))
                     check_common_rules(*params)
                     check_category(*params)
@@ -101,9 +122,4 @@ def run_checks_pr(log):
                     check_notes(*params)
         else:
             log_info(file, log, "There are no changes to be checked")
-
-        sortby = ['Project URL',
-                  'Fully-Qualified Test Name (packageName.ClassName.methodName)',
-                  'Module Path',
-                  'SHA Detected'] + pr_data['columns'][4:]
-        # check_sort(file, sortby, log)
+        sort(file, log)
