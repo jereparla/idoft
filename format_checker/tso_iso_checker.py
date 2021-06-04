@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, sort
+from utils import log_std_error, log_esp_error, log_info, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, check_sort
 
 # Contains information and data unique to tso-iso-rates.csv
 

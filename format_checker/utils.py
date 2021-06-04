@@ -97,11 +97,12 @@ def check_row_length(filename, row, i, log, header_len):
     if len(row) != header_len:
         log_std_error(filename, log, i, 'row length', str(row))
 
-# Order a file
+# Check order of a file
 
 
-def sort(filename, log):
-    command = "echo \"$(head -n1 pr-data.csv && tail +2 pr-data.csv | LC_ALL=C sort -k1,1 -k4,4 -t, -f)\" > sorted-pr-data.csv; diff pr-data.csv sorted-pr-data.csv; rm sorted-pr-data.csv"
+def check_sort(filename, log):
+    command = "echo \"$(head -n1 " + filename + " && tail +2 " + filename + " | LC_ALL=C sort -k1,1 -k4,4 -t, -f)\" >  sorted-" + \
+        filename + "; diff " + filename + " sorted-" + filename + "; rm sorted-" + filename
     diff = subprocess.check_output(command, shell=True).decode("utf-8")
-    if diff != "": 
+    if diff != "":
         log_esp_error(filename, log, "The file is not properly ordered")

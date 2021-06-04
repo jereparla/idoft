@@ -1,6 +1,6 @@
 import csv
 import re
-from utils import log_std_error, log_esp_error, log_info, log_warning, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, sort
+from utils import log_std_error, log_esp_error, log_info, log_warning, check_header, check_row_length, check_common_rules, common_data, get_committed_lines, get_uncommitted_lines, check_sort
 
 
 # Contains information and regexs unique to pr-data.csv
@@ -120,6 +120,6 @@ def run_checks_pr(log):
                     check_status(*params)
                     check_status_consistency(*params)
                     check_notes(*params)
+            check_sort(file, log)
         else:
             log_info(file, log, "There are no changes to be checked")
-        sort(file, log)
