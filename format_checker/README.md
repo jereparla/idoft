@@ -17,18 +17,18 @@ In case you're already working with another GitHub Actions worklflow, you can ad
 
 ```yml
 - uses: actions/checkout@v2
-	with:
-		fetch-depth: 0
+  with:
+    fetch-depth: 0
 - name: Install Python 3
-	uses: actions/setup-python@v2
-	with:
-		python-version: 3.9.4
+  uses: actions/setup-python@v2
+  with:
+    python-version: 3.9.4
 - name: Install dependencies
-	run: |
-		python -m pip install --upgrade pip
-		pip install errorhandler
+  run: |
+    python -m pip install --upgrade pip
+    pip install errorhandler
 - name: Run format checker
-	run: |
-		python ./format_checker/main.py 
+  run: |
+    python ./format_checker/main.py 
 ```
 
