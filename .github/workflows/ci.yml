@@ -39,6 +39,6 @@ jobs:
           pip install errorhandler
       - name: Run format checker
         run: |
-          echo "$env.EVENT_BEFORE $env.EVENT_AFTER"
+          echo "$EVENT_BEFORE $EVENT_AFTER"
           python ./format_checker/main.py 
 
