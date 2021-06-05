@@ -29,7 +29,6 @@ jobs:
         env:
           EVENT_BEFORE: ${{github.event.before}}
           EVENT_AFTER: ${{github.event.after}}
-        run: echo "$EVENT_BEFORE $EVENT_AFTER"
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
@@ -40,5 +39,6 @@ jobs:
           pip install errorhandler
       - name: Run format checker
         run: |
+          echo "$env.EVENT_BEFORE $env.EVENT_AFTER"
           python ./format_checker/main.py 
 
