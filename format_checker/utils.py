@@ -14,9 +14,11 @@ common_data = {
 # Computes which lines have been modified in the last commit
 
 
-def get_committed_lines(filename):
+def get_committed_lines(filename, commit_range):
+    commit_range = "\|".join(commit_range)
+    print(commit_range)
     command = "git blame " + filename + \
-        " | grep -n $(git rev-parse --short HEAD) | cut -f1 -d:"
+        " | grep -n \'" + commit_range + "\' | cut -f1 -d:"
     committed_lines = subprocess.check_output(command, shell=True)
     committed_lines = committed_lines.decode("utf-8").split('\n')[:-1]
     return committed_lines
