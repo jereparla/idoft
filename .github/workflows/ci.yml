@@ -37,7 +37,7 @@ jobs:
         env:
           EVENT_BEFORE: ${{github.event.before}}
           EVENT_AFTER: ${{github.event.after}}
-        if: ${{github.event_name == 'push'}}
+        if: ${{github.event_name == 'pull request'}}
         run: |
           echo "$EVENT_BEFORE $EVENT_AFTER"
           python ./format_checker/main.py 
