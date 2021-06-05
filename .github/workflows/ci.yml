@@ -46,6 +46,6 @@ jobs:
           EVENT_AFTER: ${{github.event.after}}
         if: ${{github.event_name == 'push'}}
         run: |
-          echo "$EVENT_BEFORE $EVENT_AFTER"
+          git log --oneline $EVENT_BEFORE..$EVENT_AFTER | cut -d " " -f 1
           python ./format_checker/main.py 
 
