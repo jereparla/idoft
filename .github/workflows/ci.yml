@@ -27,8 +27,9 @@ jobs:
           fetch-depth: 0
       - name: Dump GitHub context
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+          EVENT_BEFORE: ${{github.event.before}}
+          EVENT_AFTER: ${{github.event.after}}
+        run: echo "$EVENT_BEFORE $EVENT_AFTER"
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
