@@ -16,7 +16,6 @@ if __name__ == "__main__":
     log_esp_error.tracker = 0
     log_warning.tracker = 0
     commit_range = sys.argv[1:]
-    print(len(commit_range))
     checks = [run_checks_pr, run_checks_tic_fic, run_checks_tso_iso]
     for check in checks:
         check(logger, sys.argv[1:])
