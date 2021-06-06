@@ -41,10 +41,10 @@ jobs:
         run: |
           echo "$EVENT_BEFORE $EVENT_AFTER"
       - name: Run format checker on push
+        if: ${{github.event_name == 'push'}}
         env:
           EVENT_BEFORE: ${{github.event.before}}
           EVENT_AFTER: ${{github.event.after}}
-        if: ${{github.event_name == 'push'}}
         run: |
           commit_range=$(git log --oneline $EVENT_BEFORE..$EVENT_AFTER | cut -d " " -f 1)
           python ./format_checker/main.py $commit_range
