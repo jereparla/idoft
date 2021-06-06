@@ -15,7 +15,12 @@ common_data = {
 
 
 def get_committed_lines(filename, commit_range):
-    commit_range = "\|".join(commit_range)
+    if commit_range == []:
+        commit_range = subprocess.check_output(
+            "git log --oneline origin/$(git branch | grep \'\\* *\' | cut -d \" \" -f 2)..$(git rev-parse --short HEAD) | cut -d \" \" -f 1",
+            shell=True).decode("utf-8").split('\n')[
+            :-1]
+    commit_range = "\\|".join(commit_range)
     print(commit_range)
     command = "git blame " + filename + \
         " | grep -n \'" + commit_range + "\' | cut -f1 -d:"

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     print(len(commit_range))
     checks = [run_checks_pr, run_checks_tic_fic, run_checks_tso_iso]
     for check in checks:
-      check(logger, sys.argv[1:])
+        check(logger, sys.argv[1:])
     error_count = str(log_std_error.tracker + log_esp_error.tracker)
     if error_handler.fired:
         logger.critical(
