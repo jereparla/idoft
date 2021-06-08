@@ -1,3 +1,5 @@
+"""Runs the checkers and handles related errors and warnings."""
+
 import sys
 import logging
 import errorhandler
@@ -20,6 +22,7 @@ if __name__ == "__main__":
     for check in checks:
         check(logger, sys.argv[1:])
     ERROR_COUNT = str(log_std_error.tracker + log_esp_error.tracker)
+
     if error_handler.fired:
         logger.critical(
             "Failure: Exiting with code 1 due to %s logged %s",

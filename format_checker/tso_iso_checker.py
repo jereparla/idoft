@@ -1,3 +1,5 @@
+"""Implements rule checks for the tso-sio-rates.csv file."""
+
 import csv
 import re
 from utils import (
@@ -33,10 +35,13 @@ tso_iso_rates = {
 }
 
 
-# Checks validity of Total Runs In Test Suite, Number of Times Test Passed
-# In Test Suite, Total Runs In Isolation and Number of Times Test Passed In
-# Isolation
 def check_totals(filename, row, i, log):
+    """
+    Checks validity of Total Runs In Test Suite, Number of Times Test
+    Passed In Test Suite, Total Runs In Isolation and Number of Times
+    Test Passed In Isolation.
+    """
+
     keys = [
         "Total Runs In Test Suite",
         "Number of Times Test Passed In Test Suite",
@@ -48,8 +53,9 @@ def check_totals(filename, row, i, log):
             log_std_error(filename, log, i, row, key)
 
 
-# Checks validity of Is P-Value Less Or Greater Than 0.05
 def check_less_greater(filename, row, i, log):
+    """Checks validity of Is P-Value Less Or Greater Than 0.05."""
+
     if not tso_iso_rates["Less/Greater"].fullmatch(
         row["Is P-Value Less Or Greater Than 0.05"]
     ):
@@ -58,14 +64,16 @@ def check_less_greater(filename, row, i, log):
         )
 
 
-# Checks validity of P-Value
 def check_pvalue(filename, row, i, log):
+    """Checks validity of P-Value."""
+
     if not tso_iso_rates["P-Value"].fullmatch(row["P-Value"]):
         log_std_error(filename, log, i, row, "P-Value")
 
 
-# Checks validity of Number Of Test Runs In Test Suite
 def check_num_runs(filename, row, i, log):
+    """Checks validity of Number Of Test Runs In Test Suite."""
+
     if not tso_iso_rates["Failures/Runs"].fullmatch(
         row["Number Of Test Runs In Test Suite"]
     ):
@@ -74,8 +82,9 @@ def check_num_runs(filename, row, i, log):
         )
 
 
-# Checks validity of Number Of Test Failures In Test Suite
 def check_num_failures(filename, row, i, log):
+    """Checks validity of Number Of Test Failures In Test Suite."""
+
     if not tso_iso_rates["Failures/Runs"].fullmatch(
         row["Number Of Test Failures In Test Suite"]
     ):
@@ -84,8 +93,9 @@ def check_num_failures(filename, row, i, log):
         )
 
 
-# Checks that tso-iso-data.csv is properly formatted.
 def run_checks_tso_iso(log, commit_range):
+    """Checks that tso-iso-data.csv is properly formatted."""
+
     file = "tso-iso-rates.csv"
     committed_lines = get_committed_lines(file, commit_range)
     uncommitted_lines = get_uncommitted_lines(file)

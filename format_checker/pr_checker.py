@@ -1,3 +1,5 @@
+"""Implements rule checks for the pr-data.csv file."""
+
 import csv
 import re
 from utils import (
@@ -55,22 +57,24 @@ pr_data = {
 }
 
 
-# Check validity of Category
 def check_category(filename, row, i, log):
+    """Check validity of Category."""
+
     if not re.fullmatch(r"(\w+|-|\;)*\w+", row["Category"]) or not all(
         x in pr_data["Category"] for x in row["Category"].split(";")
     ):
         log_std_error(filename, log, i, row, "Category")
 
 
-# Check validity of Status
 def check_status(filename, row, i, log):
+    """Check validity of Status."""
+
     if not row["Status"] in pr_data["Status"]:
         log_std_error(filename, log, i, row, "Status")
 
 
-# Check that the status is consistent with the requirements
 def check_status_consistency(filename, row, i, log):
+    """Check that the status is consistent with the requirements."""
 
     # Checks if Status is one of Accepted, Opened, Rejected
     # and checks for required information if so
@@ -98,7 +102,7 @@ def check_status_consistency(filename, row, i, log):
 
     if row["Status"] in ["InspiredAFix", "Skipped"]:
 
-        # Must contain a note
+        # Should contain a note
         if row["Notes"] == "":
             log_warning(
                 filename,
@@ -107,7 +111,7 @@ def check_status_consistency(filename, row, i, log):
                 "Status " + row["Status"] + " should contain a note",
             )
 
-        # Must contain a PR Link
+        # Should contain a PR Link
         if row["Status"] == "InspiredAFix" and not pr_data[
             "PR Link"
         ].fullmatch(row["PR Link"]):
@@ -119,19 +123,23 @@ def check_status_consistency(filename, row, i, log):
             )
 
 
-# Checks validity of Notes
 def check_notes(filename, row, i, log):
+    """Checks validity of Notes."""
+
     if not pr_data["Notes"].fullmatch(row["Notes"]):
         log_std_error(filename, log, i, row, "Notes")
 
-# Checks validity of the PR Link
+
 def check_pr_link(filename, row, i, log):
+    """Checks validity of the PR Link."""
+
     if not pr_data["PR Link"].fullmatch(row["PR Link"]):
         log_std_error(filename, log, i, row, "PR Link")
 
 
-# Checks that pr-data.csv is properly formatted
 def run_checks_pr(log, commit_range):
+    """Checks that pr-data.csv is properly formatted."""
+
     file = "pr-data.csv"
     committed_lines = get_committed_lines(file, commit_range)
     uncommitted_lines = get_uncommitted_lines(file)

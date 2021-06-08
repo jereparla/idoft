@@ -1,3 +1,5 @@
+"""Contains functions and data common to all other modules."""
+
 import re
 import subprocess
 
@@ -12,9 +14,11 @@ common_data = {
 }
 
 
-# Turns the commit range into a useful list of commits
-# (the ones contained in the push/PR)
 def get_commit_list(commit_range):
+    """
+    Turns the commit range into a useful list of commits (the ones
+    contained in the push/PR).
+    """
 
     # If there is no commit range, it must be because the tool is running
     # locally, so get the list of commits from origin/<current-branch> to the
@@ -58,9 +62,12 @@ def get_commit_list(commit_range):
     return commit_range
 
 
-# Computes which lines have been modified in the commits
-# contained in the push/PR
 def get_committed_lines(filename, commit_range):
+    """
+    Computes which lines have been modified in the commits contained in the
+    push/PR.
+    """
+
     commit_list = get_commit_list(commit_range)
     if commit_list != []:
         commit_list = "\\|".join(commit_range)
@@ -77,21 +84,27 @@ def get_committed_lines(filename, commit_range):
     return commit_list
 
 
-# Computes which lines have been modified in filename but not yet committed
 def get_uncommitted_lines(filename):
+    """
+    Computes which lines have been modified in filename
+    but not yet committed.
+    """
+
     command = "git blame " + filename + " | grep -n '^0\\{8\\} ' | cut -f1 -d:"
     uncommitted_lines = subprocess.check_output(command, shell=True)
     uncommitted_lines = uncommitted_lines.decode("utf-8").split("\n")[:-1]
     return uncommitted_lines
 
 
-# Logs a merely informational message
 def log_info(filename, log, message):
+    """Logs a merely informational message."""
+
     log.info("INFO: On file " + filename + ": " + message)
 
 
-# Logs a standard error
 def log_std_error(filename, log, line, row, key):
+    """Logs a standard error."""
+
     log_std_error.tracker += 1
     log.error(
         "ERROR: On file "
@@ -107,14 +120,16 @@ def log_std_error(filename, log, line, row, key):
     )
 
 
-# Logs a special error
 def log_esp_error(filename, log, message):
+    """Logs a special error."""
+
     log_esp_error.tracker += 1
     log.error("ERROR: On file " + filename + ": " + message)
 
 
-# Logs a warning
 def log_warning(filename, log, line, message):
+    """Logs a warning."""
+
     log_warning.tracker += 1
     log.warning(
         "WARNING: On file "
@@ -126,17 +141,21 @@ def log_warning(filename, log, line, message):
     )
 
 
-# Validates that the header is correct
 def check_header(header, valid_dict, filename, log):
+    """Validates that the header is correct."""
+
     if not header == valid_dict["columns"]:
 
         # Check that columns are properly formatted
         log_esp_error(filename, log, "The header is improperly formatted")
 
 
-# Checks validity of Project URL, SHA Detected, Module Path,
-# Fully-Qualified Test Name (packageName.ClassName.methodName)
 def check_common_rules(filename, row, i, log):
+    """
+    Checks validity of Project URL, SHA Detected, Module Path,
+    Fully-Qualified Test Name (packageName.ClassName.methodName).
+    """
+
     if not common_data["Project URL"].fullmatch(row["Project URL"]):
         log_std_error(filename, log, i, row, "Project URL")
     if not common_data["SHA"].fullmatch(row["SHA Detected"]):
@@ -155,14 +174,16 @@ def check_common_rules(filename, row, i, log):
         )
 
 
-# Checks that each row has the required length
 def check_row_length(header_len, filename, row, i, log):
+    """Checks that each row has the required length."""
+
     if len(row) != header_len:
         log_std_error(filename, log, i, "row length", str(row))
 
 
-# Check order of a file
 def check_sort(filename, log):
+    """Checks order of a file."""
+
     command = (
         'echo "$(head -n1 '
         + filename
