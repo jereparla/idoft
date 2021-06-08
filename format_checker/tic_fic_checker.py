@@ -125,7 +125,7 @@ def run_checks_tic_fic(log, commit_range):
                 line = str(i)
                 if (line in uncommitted_lines) or (line in committed_lines):
                     params = [file, row, i, log]
-                    check_row_length(*params, len(header))
+                    check_row_length(len(header), *params)
                     check_common_rules(*params)
                     check_tic_eq_fic(*params)
                     check_tic_sha(*params)

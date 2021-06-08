@@ -153,7 +153,7 @@ def run_checks_pr(log, commit_range):
                 # deprecated--)
                 if (line in uncommitted_lines) or (line in committed_lines):
                     params = [file, row, i, log]
-                    check_row_length(*params, len(header))
+                    check_row_length(len(header), *params)
                     check_common_rules(*params)
                     check_category(*params)
                     check_status(*params)

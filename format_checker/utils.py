@@ -156,7 +156,7 @@ def check_common_rules(filename, row, i, log):
 
 
 # Checks that each row has the required length
-def check_row_length(filename, row, i, log, header_len):
+def check_row_length(header_len, filename, row, i, log):
     if len(row) != header_len:
         log_std_error(filename, log, i, "row length", str(row))
 
