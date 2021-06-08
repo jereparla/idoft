@@ -38,7 +38,7 @@ def get_commit_list(filename, commit_range):
 
 # Computes which lines have been modified in the commits contained in the push/PR
 def get_committed_lines(filename, commit_range):
-    if parse_commit_range(filename, commit_range) != []:
+    if get_commit_list(filename, commit_range) != []:
         commit_range = "\\|".join(commit_range)
         command = "git blame " + filename + \
             " | grep -n \'" + commit_range + "\' | cut -f1 -d:"
