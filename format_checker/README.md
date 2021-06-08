@@ -103,7 +103,7 @@ INFO: On file tic-fic-data.csv: There are no changes to be checked
 Success: Exiting with code 0 due to no logged errors
 ```
 
-As you can see, it exits successfully because it is a valid change, and it says that for `pr-data.csv` and `tic-fic-data.csv` there are no changes to be checked (because there aren't any!), however it ignores the file we modified: `tso-iso-rates.csv`; this is because it did have changes to be checked, however there were no errors among those changes --hence why it does not say anything about it--.
+As you can see, it exits successfully because it is a valid change, and it says that for `pr-data.csv` and `tic-fic-data.csv` there are no changes to be checked (because there aren't any!), however it ignores the file we modified: `tso-iso-rates.csv`; this is because it did have changes to be checked, however there were no errors among those changes—hence why it does not say anything about it—.
 If, instead, we made a change that violated some rule, e.g., writing 'ID;' as a Category:
 
 ```Diff
