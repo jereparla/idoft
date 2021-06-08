@@ -2,7 +2,7 @@
 
 ## Run locally
 
-### 1 Install dependencies
+### 1. Install dependencies
 
 ***Note: Python 3.9 is recommended for running this tool.***
 
@@ -12,7 +12,7 @@ The dependencies for this tool can be installed running the following from the r
 $ pip install -r format_checker/requirements.txt
 ```
 
-### 2 Run the tool
+### 2. Run the tool
 
 Running this tool locally only requires running `main.py` from the root directory:
 
