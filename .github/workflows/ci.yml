@@ -40,13 +40,16 @@ jobs:
       - name: Run format checker on new branch
         if: ${{github.event.before == "0000000000000000000000000000000000000000"}}
         run: |
-          python format_checker/main.py ${{github.event.before}} ${{github.event.commits[0].id}} ${{github.event.after}}
+          python format_checker/main.py ${{github.event.before}} ${{github.event.commits[0][id]}} ${{github.event.after}}
       - name: Run format checker on pull request
         if: ${{github.event_name == 'pull_request'}}
         run: |
           python format_checker/main.py ${{github.event.pull_request.base.sha}} ${{github.event.pull_request.head.sha}}
       - name: Run format checker on push
         if: ${{github.event_name == 'push'}}
+        env:
+          FST_COMMIT: ${{github.event.commits[0][id]}}
         run: |
+          echo "$FST_COMMIT"
           python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
           
