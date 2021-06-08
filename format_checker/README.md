@@ -2,7 +2,7 @@
 
 ## Run locally
 
-### 1. Install dependencies
+### 1.1 Install dependencies
 
 ***Note: running this tool requires Python 3.9***
 
@@ -12,7 +12,7 @@ The dependencies for this tool can be installed running the following from the r
 $ pip install -r format_checker/requirements.txt
 ```
 
-### 2. Run the tool
+### 1.2 Run the tool
 
 Running this tool locally only requires running `main.py` from the root directory:
 
@@ -21,6 +21,16 @@ $ python format_checker/main.py
 ```
 
 This will check all the implemented rules only for the rows of the `.csv` files that have been modified in some way (including row additions). It can check either for uncommitted changes (e.g. if a row was modified in `pr-data.csv` but the file wasn't committed) or for changes made in the commits related to the push/pull request that triggered the GitHub Actions build, as well as for committed changes that haven't yet been pushed. By default, the tool looks for uncommitted changes as well as committed changes every time it is run locally.
+
+## 2. Using a Virtual Environment
+
+Alternatively, you can simply run (from the root directory):
+
+```
+bash format_checker/run.sh
+```
+
+This will create a virtual environment to run this tool. **You also need Python 3.9 for this**.
 
 ## Run with GitHub Actions
 
