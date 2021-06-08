@@ -26,7 +26,14 @@ This will check all the implemented rules only for the rows of the `.csv` files 
 
 The file `ci.yml` is already set up to run this tool automatically everytime a push is made to a repository that contains it, as well as pull requests to `main`.  
 
-In case you're already working with another GitHub Actions worklflow, you can add support for this tool by adding the following steps:
+In case you're already working with another GitHub Actions worklflow, you can add support for this tool by adding this global build enviroment (or just adding  `NULL_COMMIT` to your enviroment if you already have one):
+
+```yml
+env:
+  NULL_COMMIT: '0000000000000000000000000000000000000000'
+```
+
+And adding the following steps:
 
 ```yml
 - uses: actions/checkout@v2
@@ -40,14 +47,22 @@ In case you're already working with another GitHub Actions worklflow, you can ad
   run: |
     python -m pip install --upgrade pip
     pip install -r format_checker/requirements.txt
+- name: Run format checker on new branch
+  if: >-
+    ${{github.event_name == 'push' && github.event.before ==
+    env.NULL_COMMIT}}
+  run: python format_checker/main.py ${{github.event.before}}
+    ${{github.event.commits[0].id}} ${{github.event.after}}
 - name: Run format checker on pull request
-  if: ${{github.event_name == 'pull_request'}}
-  run: |
-    python format_checker/main.py ${{github.event.pull_request.base.sha}} ${{github.event.pull_request.head.sha}}
+  if: '${{github.event_name == ''pull_request''}}'
+  run: python format_checker/main.py ${{github.event.pull_request.base.sha}}
+    ${{github.event.pull_request.head.sha}}
 - name: Run format checker on push
-  if: ${{github.event_name == 'push'}}
-  run: |
-    python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
+  if: >-
+    ${{github.event_name == 'push' && github.event.before !=
+    env.NULL_COMMIT}}
+  run: python format_checker/main.py ${{github.event.before}}
+    ${{github.event.after}}
 ```
 
 ### Example runs
