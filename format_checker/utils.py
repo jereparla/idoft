@@ -41,15 +41,16 @@ def get_commit_list(filename, commit_range):
 
 # Computes which lines have been modified in the commits contained in the push/PR
 def get_committed_lines(filename, commit_range):
-    if get_commit_list(filename, commit_range) != []:
-        commit_range = "\\|".join(commit_range)
+    commit_list = get_commit_list(filename, commit_range)
+    if commit_list != []:
+        commit_list = "\\|".join(commit_range)
         command = "git blame " + filename + \
-            " | grep -n \'" + commit_range + "\' | cut -f1 -d:"
+            " | grep -n \'" + commit_list + "\' | cut -f1 -d:"
         committed_lines = subprocess.check_output(command, shell=True)
         committed_lines = committed_lines.decode("utf-8").split('\n')[:-1]
         return committed_lines
     else:
-        return []
+        return commit_list
 
 
 # Computes which lines have been modified in filename but not yet committed
