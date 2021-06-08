@@ -1,8 +1,8 @@
-## IDoFT Format Checker
+<h1 align="center">IDoFT Format Checker</h1>
 
-### Run locally
+## Run locally
 
-#### 1. Install dependencies
+### 1. Install dependencies
 
 ***Note: running this tool requires Python 3.9***
 
@@ -12,7 +12,7 @@ The dependencies for this tool can be installed running the following from the r
 $ pip install -r format_checker/requirements.txt
 ```
 
-#### 2. Run the tool
+### 2. Run the tool
 
 Running this tool locally only requires running `main.py` from the root directory:
 
@@ -22,7 +22,7 @@ $ python format_checker/main.py
 
 This will check all the implemented rules only for the rows of the `.csv` files that have been modified in some way (including row additions). It can check either for uncommitted changes (e.g. if a row was modified in `pr-data.csv` but the file wasn't committed) or for changes made in the commits related to the push/pull request that triggered the GitHub Actions build, as well as for committed changes that haven't yet been pushed. By default, the tool looks for uncommitted changes as well as committed changes every time it is run locally.
 
-### Run with GitHub Actions
+## Run with GitHub Actions
 
 The file `ci.yml` is already set up to run this tool automatically everytime a push is made to a repository that contains it, as well as pull requests to `main`.  
 
@@ -68,7 +68,7 @@ And adding the following steps:
     ${{github.event.after}}
 ```
 
-### Example runs
+## Example runs
 
 Given the following uncommitted changes to `tso-iso-rates.csv` (the last column changes from 0 to 10):
 
