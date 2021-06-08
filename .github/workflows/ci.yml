@@ -45,6 +45,5 @@ jobs:
       - name: Run format checker on push
         if: ${{github.event_name == 'push' && github.event.before != env.NULL_COMMIT}}
         run: |
-          echo "$NULL_COMMIT"
           python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
           
