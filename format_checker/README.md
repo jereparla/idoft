@@ -106,3 +106,14 @@ Failure: Exiting with code 1 due to 1 logged error
 Note as well that it gives 2 warnings: the first one is because we also deleted the Note link from the row, and given that its Status is `InspiredAFix`, the tool *recommends* (not *enforces*) that it should have a Note. The second one is a similar scenario, except that it is recommending a pull request link if the Status is `InspiredAFix`.
 Here, the Category `ID;` is considered a rule violation and therefore the tool ends in `Failure`.
 
+
+# THIS IS A TEST CHANGE #
+
+
+
+
+
+
+
+
+
