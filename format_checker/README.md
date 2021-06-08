@@ -37,21 +37,72 @@ In case you're already working with another GitHub Actions worklflow, you can ad
 - name: Install dependencies
   run: |
     python -m pip install --upgrade pip
-    pip install errorhandler
+    pip install -r format_checker/requirements.txt
 - name: Run format checker on pull request
   if: ${{github.event_name == 'pull_request'}}
-  env:
-    BASE_SHA: ${{github.event.pull_request.base.sha}}
-    HEAD_SHA: ${{github.event.pull_request.head.sha}}
   run: |
-    commit_list=$(git log --oneline $BASE_SHA..$HEAD_SHA | cut -d " " -f 1)
-    python ./format_checker/main.py $commit_list
+    python format_checker/main.py ${{github.event.pull_request.base.sha}} ${{github.event.pull_request.head.sha}}
 - name: Run format checker on push
   if: ${{github.event_name == 'push'}}
-  env:
-    BASE_SHA: ${{github.event.before}}
-    HEAD_SHA: ${{github.event.after}}
   run: |
-    commit_list=$(git log --oneline $BASE_SHA..$HEAD_SHA | cut -d " " -f 1)
-    python ./format_checker/main.py $commit_list
+    python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
 ```
+
+### Example runs
+
+Given the following uncommitted changes to `tso-iso-rates.csv` (the last column changes from 0 to 10):
+
+```
+$ git diff tso-iso-rates.csv
+diff --git a/tso-iso-rates.csv b/tso-iso-rates.csv
+index 387296e..99fba8c 100644
+--- a/tso-iso-rates.csv
++++ b/tso-iso-rates.csv
+@@ -1,5 +1,5 @@
+ Project URL,SHA Detected,Module Path,Fully-Qualified Test Name (packageName.ClassName.methodName),Number Of Test Failures In Test Suite,Number Of Test Runs In Test Suite,P-Value,Is P-Value Less Or Greater Than 0.05,Total Runs In Test Suite,Number of Times Test Passed In Test Suite,Total Runs In Isolation,Number of Times Test Passed In Isolation
+-https://github.com/alibaba/fastjson,e05e9c5e4be580691cc55a59f3256595393203a1,.,com.alibaba.json.bvt.issue_1200.Issue1298.test_for_issue,(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;100;0;100;0;0),(100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;2000;100;100;100),0,less,4000,3800,4000,0
++https://github.com/alibaba/fastjson,e05e9c5e4be580691cc55a59f3256595393203a1,.,com.alibaba.json.bvt.issue_1200.Issue1298.test_for_issue,(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;100;0;100;0;0),(100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;100;2000;100;100;100),0,less,4000,3800,4000,10
+```
+
+Running the tool locally would output:
+
+```
+$ python format_checker/main.py
+INFO: On file pr-data.csv: There are no changes to be checked
+INFO: On file tic-fic-data.csv: There are no changes to be checked
+Success: Exiting with code 0 due to no logged errors
+```
+
+As you can see, it exits successfully because it is a valid change, and it says that for `pr-data.csv` and `tic-fic-data.csv` there are no changes to be checked (because there aren't any!), however it ignores the file we modified: `tso-iso-rates.csv`; this is because it did have changes to be checked, however there were no errors among those changes --hence why it does not say anything about it--.
+If, instead, we made a change that violated some rule, e.g., writing 'ID;' as a Category:
+
+```
+$ git diff pr-data.csv
+diff --git a/pr-data.csv b/pr-data.csv
+index 722b306..bf73e92 100644
+--- a/pr-data.csv
++++ b/pr-data.csv
+@@ -419,7 +419,7 @@ 
+-https://github.com/apache/hive,90fa9064f2c6907fbe6237cb46d5937eebd8ea31,standalone-metastore/metastore-server,org.apache.hadoop.hive.common.TestStatsSetupConst.testStatColumnEntriesCompat,ID,InspiredAFix,https://github.com/apache/hive/pull/1024,
++https://github.com/apache/hive,90fa9064f2c6907fbe6237cb46d5937eebd8ea31,standalone-metastore/metastore-server,org.apache.hadoop.hive.common.TestStatsSetupConst.testStatColumnEntriesCompat,ID;,InspiredAFix,,
+
+```
+
+Running the tool locally would output:
+
+```
+$ python format_checker/main.py
+ERROR: On file pr-data.csv, row 423:
+Invalid Category: "ID;"
+WARNING: On file pr-data.csv, row 423: 
+Status InspiredAFix should contain a note
+WARNING: On file pr-data.csv, row 423: 
+Status InspiredAFix should have a PR Link
+INFO: On file tic-fic-data.csv: There are no changes to be checked
+INFO: On file tso-iso-rates.csv: There are no changes to be checked
+Failure: Exiting with code 1 due to 1 logged error
+```
+
+Note as well that it gives 2 warnings: the first one is because we also deleted the Note link from the row, and given that its Status is `InspiredAFix`, the tool *recommends* (not *enforces*) that it should have a Note. The second one is a similar scenario, except that it is recommending a pull request link if the Status is `InspiredAFix`.
+Here, the Category `ID;` is considered a rule violation and therefore the tool ends in `Failure`.
+

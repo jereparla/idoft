@@ -35,18 +35,10 @@ jobs:
           pip install -r format_checker/requirements.txt
       - name: Run format checker on pull request
         if: ${{github.event_name == 'pull_request'}}
-        env:
-          BASE_SHA: ${{github.event.pull_request.base.sha}}
-          HEAD_SHA: ${{github.event.pull_request.head.sha}}
         run: |
-          commit_list=$(git log --oneline $BASE_SHA..$HEAD_SHA | cut -d " " -f 1)
-          python ./format_checker/main.py $commit_list
+          python format_checker/main.py ${{github.event.pull_request.base.sha}} ${{github.event.pull_request.head.sha}}
       - name: Run format checker on push
         if: ${{github.event_name == 'push'}}
-        env:
-          BASE_SHA: ${{github.event.before}}
-          HEAD_SHA: ${{github.event.after}}
         run: |
-          commit_list=$(git log --oneline $BASE_SHA..$HEAD_SHA | cut -d " " -f 1)
-          python ./format_checker/main.py $commit_list
-
+          python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
+          
