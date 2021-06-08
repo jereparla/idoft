@@ -44,7 +44,7 @@ jobs:
       - name: Run format checker on push
         if: ${{github.event_name == 'push'}}
         env:
-          FST_COMMIT: ${{github.event.commits[0].messsage}}
+          FST_COMMIT: ${{github.event.commits[0].id}}
         run: |
           echo "$FST_COMMIT"
           python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
