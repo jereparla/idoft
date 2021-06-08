@@ -35,7 +35,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r format_checker/requirements.txt
       - name: Run format checker on new branch
-        if: ${{github.event_name == 'push' && github.event.before == $NULL_COMMIT}}
+        if: ${{github.event_name == 'push' && github.event.before == env.NULL_COMMIT}}
         run: |
           python format_checker/main.py ${{github.event.before}} ${{github.event.commits[0].id}} ${{github.event.after}}
       - name: Run format checker on pull request
@@ -43,7 +43,7 @@ jobs:
         run: |
           python format_checker/main.py ${{github.event.pull_request.base.sha}} ${{github.event.pull_request.head.sha}}
       - name: Run format checker on push
-        if: ${{github.event_name == 'push' && github.event.before != $NULL_COMMIT}}
+        if: ${{github.event_name == 'push' && github.event.before != env.NULL_COMMIT}}
         run: |
           echo "$NULL_COMMIT"
           python format_checker/main.py ${{github.event.before}} ${{github.event.after}}
