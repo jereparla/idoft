@@ -1,4 +1,4 @@
-## Format Checker
+## IDoFT Format Checker
 
 ### Run locally
 
