@@ -6,6 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      # When there is no base commit (e.g., first push to a new branch), 
+      # GitHub assigns a strin of zeros to event.before. It's necessary to 
+      # handle this separately
       NULL_COMMIT: '0000000000000000000000000000000000000000'
     steps:
       - uses: actions/checkout@v2
@@ -19,6 +22,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r format_checker/requirements.txt
+        # Only run this step if the event is a push and event.before shows 
+        # that it's the first push to a new branch
       - if: >-
           ${{github.event_name == 'push' && github.event.before ==
           env.NULL_COMMIT}}
@@ -26,11 +31,14 @@ jobs:
         run: >
           python format_checker/main.py ${{github.event.before}}
           ${{github.event.commits[0].id}} ${{github.event.after}}
-      - if: '${{github.event_name == ''pull_request''}}'
+        # Only run this step if the event is a pull request
+      - if: ${{github.event_name == 'pull_request'}}
         name: Run format checker on pull request
         run: >
           python format_checker/main.py ${{github.event.pull_request.base.sha}}
           ${{github.event.pull_request.head.sha}}
+        # Only run this step if the event is a push and it's not the first one
+        # to a new branch
       - if: >-
           ${{github.event_name == 'push' && github.event.before !=
           env.NULL_COMMIT}} 

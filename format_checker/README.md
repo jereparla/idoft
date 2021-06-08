@@ -47,21 +47,24 @@ And adding the following steps:
   run: |
     python -m pip install --upgrade pip
     pip install -r format_checker/requirements.txt
-- name: Run format checker on new branch
-  if: >-
+- if: >-
     ${{github.event_name == 'push' && github.event.before ==
     env.NULL_COMMIT}}
-  run: python format_checker/main.py ${{github.event.before}}
+  name: Run format checker on new branch
+  run: >
+    python format_checker/main.py ${{github.event.before}}
     ${{github.event.commits[0].id}} ${{github.event.after}}
-- name: Run format checker on pull request
-  if: '${{github.event_name == ''pull_request''}}'
-  run: python format_checker/main.py ${{github.event.pull_request.base.sha}}
+- if: '${{github.event_name == ''pull_request''}}'
+  name: Run format checker on pull request
+  run: >
+    python format_checker/main.py ${{github.event.pull_request.base.sha}}
     ${{github.event.pull_request.head.sha}}
-- name: Run format checker on push
-  if: >-
+- if: >-
     ${{github.event_name == 'push' && github.event.before !=
-    env.NULL_COMMIT}}
-  run: python format_checker/main.py ${{github.event.before}}
+    env.NULL_COMMIT}} 
+  name: Run format checker on push
+  run: >
+    python format_checker/main.py ${{github.event.before}}
     ${{github.event.after}}
 ```
 
