@@ -27,7 +27,10 @@ def get_commit_list(filename, commit_range):
 
     # If it's the first push to a new branch, the event.before commit will be all zeroes.
     elif re.fullmatch(r'0{40}', commit_range[0]):
-        commit_range = [commit_range[1]]
+        commit_range = [commit_range[0]] + subprocess.check_output(
+            "git log --oneline " + str(commit_range[0]) + ".." +
+            str(commit_range[1]) + " | cut -d \" \" -f 1",
+            shell=True).decode("utf-8").split('\n')[:-1]
     else:
         commit_range = subprocess.check_output(
             "git log --oneline " + str(commit_range[0]) + ".." +
