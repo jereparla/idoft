@@ -39,10 +39,8 @@ jobs:
           pip install -r format_checker/requirements.txt
       - name: Run format checker on new branch
         if: ${{github.event_name == 'push' && github.event.before == '0000000000000000000000000000000000000000'}}
-        env:
-          FST_COMMIT: ${{github.event.commits[0].id}}
         run: |
-          echo "$FST_COMMIT"
+          python format_checker/main.py ${{github.event.before}} ${{github.event.commits[0].id}} ${{github.event.after}}
       - name: Run format checker on pull request
         if: ${{github.event_name == 'pull_request'}}
         run: |
