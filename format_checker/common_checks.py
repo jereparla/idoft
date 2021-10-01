@@ -3,6 +3,7 @@
 import re
 import csv
 import subprocess
+import os
 from utils import (
     get_committed_lines,
     get_uncommitted_lines,
@@ -93,6 +94,18 @@ def check_sort(filename, log):
     if diff != "":
         log_esp_error(filename, log, "The file is not properly ordered")
 
+def run_test(filename, row, i, log):
+    """Runs the test."""
+
+    clone = f"git clone {row['Project URL']}.git"
+    subprocess.call(clone, shell=True)
+    os.chdir(row["Project URL"].split("/")[-1])
+    checkout = f"git checkout {row['SHA Detected']}"
+    subprocess.call(checkout, shell=True)
+    install = f"mvn install -pl {row['Module Path']} -am -Ddependency-check.skip=true -Dgpg.skip=true -DfailIfNoTests=false -Dskip.installnodenpm -Dskip.npm -Dskip.yarn -Dlicense.skip -Dcheckstyle.skip -Drat.skip -Denforcer.skip -Danimal.sniffer.skip -Dmaven.javadoc.skip -Dfindbugs.skip -Dwarbucks.skip -Dmodernizer.skip -Dimpsort.skip -Dmdep.analyze.skip -Dpgpverify.skip -Dxml.skip -Dcobertura.skip=true -Dfindbugs.skip=true"
+    subprocess.call(install, shell=True)
+    run = f"mvn test -Dtest={row['Fully-Qualified Test Name (packageName.ClassName.methodName)']}"
+    subprocess.call(run, shell=True)
 
 def run_checks(file, data_dict, log, commit_range, checks):
     """Checks rule compliance for any given dataset file."""
