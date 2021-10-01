@@ -6,6 +6,7 @@ from common_checks import (
     check_common_rules,
     check_row_length,
     run_checks,
+    run_test,
 )
 
 # Contains information and data unique to tso-iso-rates.csv
@@ -100,5 +101,6 @@ def run_checks_tso_iso(log, commit_range):
         check_pvalue,
         check_less_greater,
         check_totals,
+        run_test,
     ]
     run_checks("tso-iso-rates.csv", tso_iso_rates, log, commit_range, checks)

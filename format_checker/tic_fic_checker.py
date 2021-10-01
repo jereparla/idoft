@@ -7,6 +7,7 @@ from common_checks import (
     check_common_rules,
     check_row_length,
     run_checks,
+    run_test,
 )
 
 
@@ -130,5 +131,6 @@ def run_checks_tic_fic(log, commit_range):
         check_fic_sha,
         check_mods,
         check_days_between,
+        run_test,
     ]
     run_checks("tic-fic-data.csv", tic_fic_data, log, commit_range, checks)
