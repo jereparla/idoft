@@ -106,6 +106,7 @@ def run_test(filename, row, i, log):
     subprocess.call(install, shell=True)
     run = f"mvn test -Dtest={row['Fully-Qualified Test Name (packageName.ClassName.methodName)']}"
     subprocess.call(run, shell=True)
+    os.chdir("../")
 
 def run_checks(file, data_dict, log, commit_range, checks):
     """Checks rule compliance for any given dataset file."""
